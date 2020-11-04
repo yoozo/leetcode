@@ -8,6 +8,7 @@
   },
   "scripts": {
     "new": "node create.js",
+    "new:url": "node createByUrl.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -21,6 +22,7 @@
   },
   "homepage": "https://github.com/yoozo/leetcode#readme",
   "dependencies": {
-    "cli-color": "^2.0.0"
+    "cli-color": "^2.0.0",
+    "puppeteer": "^5.4.1"
   }
 }
