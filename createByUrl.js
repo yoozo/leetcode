@@ -7,17 +7,17 @@ const url = args[2];
 
 
 async function getPageInfo(url) {
-    const browser = await puppeteer.launch({defaultViewport: { width: 1920, height: 1080 }});
+    const browser = await puppeteer.launch({ defaultViewport: { width: 1920, height: 1080 } });
     const page = await browser.newPage();
     await page.goto(url);
 
-    while(!await page.click('#lang-select')){
-        if(await page.$('div[data-cypress=LanguageSelector-JavaScript]')){
+    while (!await page.click('#lang-select')) {
+        if (await page.$('div[data-cypress=LanguageSelector-JavaScript]')) {
             await page.click('div[data-cypress=LanguageSelector-JavaScript]')
             break;
         }
         // 删除登录框
-        if(await page.$('.modal-container')) {
+        if (await page.$('.modal-container')) {
             await page.evaluate(() => {
                 let element = document.querySelector('.modal-container');
                 element.parentNode.removeChild(element);
@@ -59,11 +59,18 @@ async function getPageInfo(url) {
     }
 }
 
+function checkPageInfo(item) {
+    if (!item.fileName || !item.questionTitle || !item.code) {
+        throw new Error(`pageInfo is \n${JSON.stringify(item, null, "  ")}`)
+    }
+}
+
 // main
 (async () => {
     let pageInfo = {}
     try {
         pageInfo = await getPageInfo(url)
+        checkPageInfo(pageInfo)
     } catch (e) {
         console.error(clc.bgRed('[Call error]'), clc.red('request leetcode.com faild:', e.message))
         exit()
@@ -79,7 +86,7 @@ async function getPageInfo(url) {
         const codeData = `// ${pageInfo.questionTitle}. \n` + `// ${url}\n\n` + `${pageInfo.code}`
         try {
             await fs.writeFileSync(path, codeData)
-            console.log(clc.green(`create ${pageInfo.fileName} file success!\nproblem url: ${url}`))
+            console.log(clc.green(`create ${pageInfo.fileName} file success!\nproblem url: ${url}\nfile path: ${path}`))
         } catch (e) {
             console.error(clc.bgRed('[write file error]'), clc.red(e.message))
         }
