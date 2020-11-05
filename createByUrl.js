@@ -42,11 +42,28 @@ async function getPageInfo(url) {
         }
     });
     const funcReg = /var\s(.*)\s=\sfunction/
-    const index = questionTitle.split('.')[0]
+    let index = questionTitle.split('.')[0]
     const funcMatch = code.match(funcReg)
     let funcName = ''
     if (funcMatch && funcMatch.length === 2) {
         funcName = funcMatch[1]
+    }
+
+    // 文件前缀是否数字，不是则用leetcode作为前缀
+    const numReg = /^[0-9]+?$/;
+    if (!numReg.test(index)) {
+        const leetCodeFileReg = new RegExp(`^leetcode_[0-9]+?_${funcName}.js$`) //;
+        const libDir = fs.readdirSync('lib/')
+        let i = 1
+        for (const item of libDir) {
+            if (item.indexOf('leetcode') === 0) {
+                if (leetCodeFileReg.test(item)) {
+                    throw new Error("file may exist - " + item);
+                }
+                i++
+            }
+        }
+        index = `leetcode_${i}`
     }
     const fileName = `${index}_${funcName}.js`
 
