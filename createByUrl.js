@@ -7,22 +7,26 @@ const url = args[2];
 
 
 async function getPageInfo(url) {
-    const browser = await puppeteer.launch();
+    const browser = await puppeteer.launch({defaultViewport: { width: 1920, height: 1080 }});
     const page = await browser.newPage();
     await page.goto(url);
 
     // 点击呼出登录框
-    await page.click('#lang-select')
-    // 删除登录框
-    await page.evaluate(() => {
-        let element = document.querySelector('.modal-container');
-        element.parentNode.removeChild(element);
-        console.log("success remove class modal-container")
-    });
-    // 点击呼出语言选择框
-    await page.click('#lang-select')
-    // 选择JavaScript
-    await page.click('div[data-cypress=LanguageSelector-JavaScript]')
+    while(!await page.click('#lang-select')){
+        if(await page.$('div[data-cypress=LanguageSelector-JavaScript]')){
+            await page.click('div[data-cypress=LanguageSelector-JavaScript]')
+            break;
+        }
+        // 删除登录框
+        if(await page.$('.modal-container')) {
+            await page.evaluate(() => {
+                let element = document.querySelector('.modal-container');
+                element.parentNode.removeChild(element);
+                console.log("success remove class modal-container")
+            });
+        }
+
+    }
 
     const { questionTitle, code } = await page.evaluate(() => {
         const titleDom = document.querySelector('h4[data-cypress=QuestionTitle]')
@@ -42,7 +46,7 @@ async function getPageInfo(url) {
     const index = questionTitle.split('.')[0]
     const funcMatch = code.match(funcReg)
     let funcName = ''
-    if (funcMatch.length = 2) {
+    if (funcMatch && funcMatch.length === 2) {
         funcName = funcMatch[1]
     }
     const fileName = `${index}_${funcName}.js`
@@ -65,7 +69,6 @@ async function getPageInfo(url) {
         console.error(clc.bgRed('[Call error]'), clc.red('request leetcode.com faild:', e.message))
         exit()
     }
-
 
     // 判断是否存在文件
     const path = "lib/" + pageInfo.fileName
