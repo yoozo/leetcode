@@ -11,7 +11,6 @@ async function getPageInfo(url) {
     const page = await browser.newPage();
     await page.goto(url);
 
-    // 点击呼出登录框
     while(!await page.click('#lang-select')){
         if(await page.$('div[data-cypress=LanguageSelector-JavaScript]')){
             await page.click('div[data-cypress=LanguageSelector-JavaScript]')
