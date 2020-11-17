@@ -11,8 +11,8 @@ async function getPageInfo(url) {
     const page = await browser.newPage();
 
     let flag = 1
-    let retry = 15
-    let timeout = 5
+    let retry = 4
+    let timeout = 20
     while (flag) {
         try {
             await page.goto(url, { 'timeout': 1000 * timeout })
