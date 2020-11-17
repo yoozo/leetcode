@@ -7,25 +7,33 @@ const url = args[2];
 
 
 async function getPageInfo(url) {
+
     const browser = await puppeteer.launch({ defaultViewport: { width: 1920, height: 1080 } });
     const page = await browser.newPage();
 
     let flag = 1
-    let retry = 15
-    let timeout = 5
+    let retry = 50
+    let timeout = args[3]-0
+
+    let start = new Date()
+
     while (flag) {
         try {
             await page.goto(url, { 'timeout': 1000 * timeout })
+            console.log(`flag: `, flag, ' timeout: ', timeout)
             flag = 0
         } catch (e) {
-            console.log(clc.yellow(e.message))
-            if(flag < retry){
+            // console.log(clc.yellow(flag + e.message))
+            if (flag < retry) {
                 flag++
-            }else{
+            } else {
                 throw new Error(`More than ${retry} retries`)
             }
         }
     }
+    let end = new Date()
+    console.log('end - start = ', end - start)
+
 
     while (!await page.click('#lang-select')) {
         if (await page.$('div[data-cypress=LanguageSelector-JavaScript]')) {
@@ -63,7 +71,7 @@ async function getPageInfo(url) {
     let funcName = ''
     if (funcMatch && funcMatch.length === 2) {
         funcName = funcMatch[1]
-    }else{
+    } else {
         throw new Error(`call page.evaluate() get questionTitle and code faild! questionTitle: ${questionTitle}, code: ${code}`)
     }
 
