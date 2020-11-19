@@ -19,9 +19,9 @@ async function getPageInfo(url) {
             flag = 0
         } catch (e) {
             console.log(clc.yellow(e.message))
-            if(flag < retry){
+            if (flag < retry) {
                 flag++
-            }else{
+            } else {
                 throw new Error(`More than ${retry} retries`)
             }
         }
@@ -43,7 +43,7 @@ async function getPageInfo(url) {
 
     }
 
-    const { questionTitle, code } = await page.evaluate(() => {
+    let { questionTitle, code } = await page.evaluate(() => {
         const titleDom = document.querySelector('h4[data-cypress=QuestionTitle]')
         const codeDom = document.querySelectorAll('.view-line')
         let codeString = ''
@@ -63,7 +63,7 @@ async function getPageInfo(url) {
     let funcName = ''
     if (funcMatch && funcMatch.length === 2) {
         funcName = funcMatch[1]
-    }else{
+    } else {
         throw new Error(`call page.evaluate() get questionTitle and code faild! questionTitle: ${questionTitle}, code: ${code}`)
     }
 
@@ -85,7 +85,7 @@ async function getPageInfo(url) {
     }
     const fileName = `${index}_${funcName}.js`
 
-
+    code += `\n\nconsole.log(${funcName}())`
     await browser.close();
     return {
         fileName,
