@@ -1,21 +1,21 @@
 // 插入排序
 function insertSort(arr: number[]) {
-    const swap = (arr: number[], x: number, y: number) => {
-        const swapNum = arr[y]
-        arr[y] = arr[x]
-        arr[x] = swapNum
-    }
-
-    let lastIndex = 1
-    while (lastIndex < arr.length) {
-        for (let i = lastIndex; i > 0; i--) {
-            if (arr[i] < arr[i - 1]) {
-                swap(arr, i, i - 1)
+    for (let lastIndex = 1; lastIndex < arr.length; lastIndex++) {
+        const lastValue = arr[lastIndex]
+        let insertIndex = lastIndex
+        for (let i = lastIndex - 1; i >= 0; i--) {
+            if (lastValue < arr[i]) {
+                // 向后移动一位
+                arr[i + 1] = arr[i]
+                insertIndex = i
+            } else {
+                // 插入
+                break
             }
         }
-
-        lastIndex++
+        arr[insertIndex] = lastValue
     }
+
     return arr
 }
 
